@@ -1,0 +1,8 @@
+/* line 3, ../sass/myStyles.sass */
+.FB-chat-drag-btn {
+  position: absolute;
+  z-index: 99999999;
+  width: 40px;
+  line-height: 10px;
+  left: 110px;
+}
