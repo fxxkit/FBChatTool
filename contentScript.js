@@ -5,7 +5,6 @@ $(function(){
 	FB_ChatRoomDragger.appendBtn();
 	FB_ChatRoomDragger.bindDragEvent();
 
-
 	// Append btn & Bind Event when click side friend
 	$('._42fz').on('click',function(){
 		console.log('click side friends for chat room');
@@ -25,11 +24,6 @@ $(function(){
 		var delayDragEvent = _.bind(FB_ChatRoomDragger.bindDragEvent,FB_ChatRoomDragger);
 		_.delay(delayDragEvent,2000);			
 	});
-
-
-	// Add sidebar control btn
-	//FB_ChatSidebarBtn.appendBtn();
-
 });
 
 var FB_ChatRoomDragger = {
@@ -62,17 +56,14 @@ var FB_ChatRoomDragger = {
 			},
 			start: function(event, ui ){
 				console.log('start dragging the btn!!!!');
-				//console.log(ui.offset);
+				//Get previous x-offset
 				preX_offset = ui.offset.top;
 				// Show fake border
 				$(this).next().css({'display':'block'});
 			},
 			stop: function(event, ui ){
 				console.log('stop dragging the btn!!!!');
-				//console.log(ui.offset);
 				var xDistance = ui.offset.top - preX_offset;
-				//console.log('xDistince: ' + xDistance);
-
 				var newHeight = 0;
 
 				// Conversation div (.fbNubFlyoutBody)
@@ -85,6 +76,7 @@ var FB_ChatRoomDragger = {
 				var resizeTarget2 = $(this).parent().parent().parent();
 				var resizeTarget_height2 = $(resizeTarget2).height();
 				var newHeight = resizeTarget_height2 - xDistance;
+				$(resizeTarget2).css({'max-height':''}); // unset max-height
 				$(resizeTarget2).height(newHeight);
 
 				//resetting the btn position
@@ -100,11 +92,5 @@ var FB_ChatRoomDragger = {
 				$(fakeBorder).css({'top': ui.position.top + 16});
 			},
 		});
-	}
-};
-
-var FB_ChatSidebarBtn = {
-	appendBtn: function(){
-		$('.fbChatSidebar').append("<span class='FB-chat-sidebar-btn glyphicon glyphicon-chevron-up btn btn-default btn-xs'></span>");
 	}
 }
