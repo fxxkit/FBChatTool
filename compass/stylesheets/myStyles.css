@@ -3,6 +3,27 @@
   position: absolute;
   z-index: 99999999;
   width: 40px;
-  line-height: 10px;
   left: 110px;
+}
+
+/* line 9, ../sass/myStyles.sass */
+.FB-chat-sidebar-btn {
+  position: absolute;
+  z-index: 99999999;
+  width: 20px;
+  height: 40px;
+  left: -20px;
+  top: 0px;
+}
+
+/* line 17, ../sass/myStyles.sass */
+.fb-chat-fake-border {
+  position: absolute;
+  top: 16px;
+  width: 100%;
+  height: 500%;
+  z-index: 99999999;
+  border-style: dashed;
+  border-color: #a1c7ef;
+  display: none;
 }
