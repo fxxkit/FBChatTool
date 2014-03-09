@@ -7,16 +7,6 @@
 }
 
 /* line 9, ../sass/myStyles.sass */
-.FB-chat-sidebar-btn {
-  position: absolute;
-  z-index: 99999999;
-  width: 20px;
-  height: 40px;
-  left: -20px;
-  top: 0px;
-}
-
-/* line 17, ../sass/myStyles.sass */
 .fb-chat-fake-border {
   position: absolute;
   top: 16px;

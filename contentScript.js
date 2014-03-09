@@ -6,7 +6,7 @@ $(function(){
 	FB_ChatRoomDragger.bindDragEvent();
 
 	// Append btn & Bind Event when click side friend
-	$('._42fz').on('click',function(){
+	$('.fbChatOrderedList').on('click',function(){
 		console.log('click side friends for chat room');
 		var delayAppendBtn = _.bind(FB_ChatRoomDragger.appendBtn, FB_ChatRoomDragger);
         _.delay(delayAppendBtn,1500);
@@ -66,18 +66,28 @@ var FB_ChatRoomDragger = {
 				var xDistance = ui.offset.top - preX_offset;
 				var newHeight = 0;
 
+				// Outest wrapper (.fbNubFlyout .fbDockChatTabFlyout)
+				var resizeTarget2 = $(this).parent().parent().parent();
+				var resizeTarget_height2 = $(resizeTarget2).height();
+				var newHeight2 = resizeTarget_height2 - xDistance;
+				var maxHeight = parseInt($(resizeTarget2).css('max-height').split('px')[0]);
+
 				// Conversation div (.fbNubFlyoutBody)
 				var resizeTarget = $(this).next().next().next().next();
 				var resizeTarget_height = $(resizeTarget).height();
 				var newHeight = resizeTarget_height - xDistance;
-				$(resizeTarget).height(newHeight);
-				
-				// Outest wrapper (.fbNubFlyout .fbDockChatTabFlyout)
-				var resizeTarget2 = $(this).parent().parent().parent();
-				var resizeTarget_height2 = $(resizeTarget2).height();
-				var newHeight = resizeTarget_height2 - xDistance;
-				$(resizeTarget2).css({'max-height':''}); // unset max-height
-				$(resizeTarget2).height(newHeight);
+
+				// Setting the new height
+				if(newHeight2 > maxHeight){
+					$(resizeTarget2).height(maxHeight); // new wrapper height (constrainted)
+					var innerHeight = newHeight - ( newHeight2 - maxHeight); // compute the conversation body height
+					$(resizeTarget).height(innerHeight); // new conversation body height (constrainted)
+				}
+				else{
+					$(resizeTarget2).height(newHeight2); // new wrapper height
+					$(resizeTarget).height(newHeight); // new conversation body height
+				}				
+
 
 				//resetting the btn position
 				$(this).css({'top': 0});
