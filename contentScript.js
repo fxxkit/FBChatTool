@@ -8,23 +8,38 @@ $(function(){
 	// Append btn & Bind Event when click side friend
 	$('.fbChatOrderedList').on('click',function(){
 		console.log('click side friends for chat room');
-		var delayAppendBtn = _.bind(FB_ChatRoomDragger.appendBtn, FB_ChatRoomDragger);
-        _.delay(delayAppendBtn,1500);
-		
-		var delayDragEvent = _.bind(FB_ChatRoomDragger.bindDragEvent,FB_ChatRoomDragger);
-		_.delay(delayDragEvent,2000);			
+		delayInit(1500,2000);			
 	});
 
 	// Append btn & Bind Event when click top friend
 	$('.jewelContent').on('click',function(){
 		console.log('click top friends for chat room');
-		var delayAppendBtn = _.bind(FB_ChatRoomDragger.appendBtn, FB_ChatRoomDragger);
-        _.delay(delayAppendBtn,1500);
-		
-		var delayDragEvent = _.bind(FB_ChatRoomDragger.bindDragEvent,FB_ChatRoomDragger);
-		_.delay(delayDragEvent,2000);			
+		delayInit(1500,2000);			
+	});
+
+	// Listen the msg from friends
+	var unreadMsgCount = parseInt($('#mercurymessagesCountValue').html());
+	$('#mercurymessagesCountValue').on('DOMSubtreeModified',function(){
+		var now_unreadMsgCount = parseInt($(this).html());
+		// Ignore trigger by class change
+		if(now_unreadMsgCount >= 0){
+			if( now_unreadMsgCount != unreadMsgCount){
+				console.log('add btn (trigger by msg from friends)');
+				delayInit(1500,2000);
+			}
+			unreadMsgCount = now_unreadMsgCount;			
+		}
 	});
 });
+
+function delayInit(append_btn_delay, bind_event_delay){
+	var delayAppendBtn = _.bind(FB_ChatRoomDragger.appendBtn, FB_ChatRoomDragger);
+    _.delay(delayAppendBtn,append_btn_delay);
+	
+	var delayDragEvent = _.bind(FB_ChatRoomDragger.bindDragEvent,FB_ChatRoomDragger);
+	_.delay(delayDragEvent,bind_event_delay);
+
+}
 
 var FB_ChatRoomDragger = {
 	preX_offset_: 0,
@@ -49,10 +64,9 @@ var FB_ChatRoomDragger = {
 			//Get conversation id & Set previous height
 			try{
 				var cID = $(currentChatDOM).find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1];
-				console.log(cID);
+				//console.log(cID);
 				chrome.storage.local.get(function(obj){
 					var data = obj[cID];
-					console.log(data.newHeight +' , '+ data.newHeight2);
 
 					// Outest wrapper (.fbNubFlyout .fbDockChatTabFlyout)
 					var resizeTarget2 = $(currentChatDOM).parent().parent().parent();
@@ -74,7 +88,7 @@ var FB_ChatRoomDragger = {
 				})			
 			}
 			catch(err){
-				console.log(err);
+				//console.log(err);
 			}
 		});
 	},
@@ -83,7 +97,7 @@ var FB_ChatRoomDragger = {
 		$('.FB-chat-drag-btn').draggable({
 			axis: "y",
 			create: function(event, ui ){
-				console.log('crate event triggered');
+				console.log('create event triggered');
 			},
 			start: function(event, ui ){
 				console.log('start dragging the btn!!!!');
@@ -123,7 +137,7 @@ var FB_ChatRoomDragger = {
 				var cID = $(this).next().next().find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1]; //Get conversation ID
 				var storeObj = {};
 				storeObj[cID] = {'newHeight2': newHeight2, 'newHeight': newHeight};
-				console.log(storeObj);				
+				//console.log(storeObj);				
 				chrome.storage.local.set(storeObj, function(){
 					console.log('Store the new height: '+ cID);
 				});
