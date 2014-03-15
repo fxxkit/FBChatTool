@@ -45,6 +45,37 @@ var FB_ChatRoomDragger = {
 				var fakeBorder = $('<div/>').addClass('fb-chat-fake-border');
 				$(currentChatDOM).before(fakeBorder);
 			}
+
+			//Get conversation id & Set previous height
+			try{
+				var cID = $(currentChatDOM).find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1];
+				console.log(cID);
+				chrome.storage.local.get(function(obj){
+					var data = obj[cID];
+					console.log(data.newHeight +' , '+ data.newHeight2);
+
+					// Outest wrapper (.fbNubFlyout .fbDockChatTabFlyout)
+					var resizeTarget2 = $(currentChatDOM).parent().parent().parent();
+					var maxHeight = parseInt($(resizeTarget2).css('max-height').split('px')[0]);
+				
+					// Conversation div (.fbNubFlyoutBody)
+					var resizeTarget = $(currentChatDOM).next().next();
+
+					// Setting initial height
+					if(data.newHeight2 > maxHeight){
+						$(resizeTarget2).height(maxHeight); // new wrapper height (constrainted)
+						var innerHeight = data.newHeight - ( data.newHeight2 - maxHeight); // compute the conversation body height
+						$(resizeTarget).height(innerHeight); // new conversation body height (constrainted)
+					}
+					else{
+						$(resizeTarget2).height(data.newHeight2); // new wrapper height
+						$(resizeTarget).height(data.newHeight); // new conversation body height
+					}
+				})			
+			}
+			catch(err){
+				console.log(err);
+			}
 		});
 	},
 
@@ -87,7 +118,15 @@ var FB_ChatRoomDragger = {
 					$(resizeTarget2).height(newHeight2); // new wrapper height
 					$(resizeTarget).height(newHeight); // new conversation body height
 				}				
-
+ 	
+				//Store the value to local storage
+				var cID = $(this).next().next().find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1]; //Get conversation ID
+				var storeObj = {};
+				storeObj[cID] = {'newHeight2': newHeight2, 'newHeight': newHeight};
+				console.log(storeObj);				
+				chrome.storage.local.set(storeObj, function(){
+					console.log('Store the new height: '+ cID);
+				});
 
 				//resetting the btn position
 				$(this).css({'top': 0});
