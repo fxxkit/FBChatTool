@@ -6,15 +6,15 @@ $(function(){
 	FB_ChatRoomDragger.bindDragEvent();
 
 	// Append btn & Bind Event when click side friend
-	$('.fbChatOrderedList').on('click',function(){
+	$('.fbChatSidebarBody').on('click',function(){
 		console.log('click side friends for chat room');
-		delayInit(1500,2000);			
+		delayInit_Dragger(1500,2000);
 	});
 
 	// Append btn & Bind Event when click top friend
 	$('.jewelContent').on('click',function(){
 		console.log('click top friends for chat room');
-		delayInit(1500,2000);			
+		delayInit_Dragger(1500,2000);			
 	});
 
 	// Listen the msg from friends
@@ -25,20 +25,43 @@ $(function(){
 		if(now_unreadMsgCount >= 0){
 			if( now_unreadMsgCount != unreadMsgCount){
 				console.log('add btn (trigger by msg from friends)');
-				delayInit(1500,2000);
+				delayInit_Dragger(1500,2000);
 			}
 			unreadMsgCount = now_unreadMsgCount;			
 		}
 	});
+	// Initialize replay class
+	init_Replay();
 });
 
-function delayInit(append_btn_delay, bind_event_delay){
+function delayInit_Dragger(append_btn_delay, bind_event_delay){
 	var delayAppendBtn = _.bind(FB_ChatRoomDragger.appendBtn, FB_ChatRoomDragger);
     _.delay(delayAppendBtn,append_btn_delay);
 	
 	var delayDragEvent = _.bind(FB_ChatRoomDragger.bindDragEvent,FB_ChatRoomDragger);
 	_.delay(delayDragEvent,bind_event_delay);
 
+}
+
+function init_Replay(){
+	// Listen keyboard arrow event
+	$('.uiTextareaAutogrow').on('keydown',function(event){
+		var $currentChatDOM = $(this);
+
+		FB_ChatRoomReplay.$currentChatDOM = $currentChatDOM;
+		if(event.keyCode == 13){
+			//FB_ChatRoomReplay.newline();
+			FB_ChatRoomReplay.init(true);			
+		}
+		if(event.keyCode == 38 || event.keyCode == 40){
+			FB_ChatRoomReplay.getWords(event.keyCode);
+		}
+	});
+	$('.uiTextareaAutogrow').on('focus',function(){
+		var $currentChatDOM = $(this);
+		FB_ChatRoomReplay.$currentChatDOM = $currentChatDOM;
+		FB_ChatRoomReplay.init(false);
+	});
 }
 
 var FB_ChatRoomDragger = {
@@ -156,4 +179,73 @@ var FB_ChatRoomDragger = {
 			},
 		});
 	}
-}
+};
+
+var FB_ChatRoomReplay = {
+	myWords_: {}, // {'fName':[sentence... ],...}
+	currentIdx_: {}, // {'fName': currentIdx,...}
+	$prevChatDOM_: NaN,
+	$currentChatDOM: NaN,
+	getWords: function(keyCode){
+		var fName = this.get_fName_();  // Get fName		
+		// Update sentence index
+		if(keyCode == 38){
+			//console.log('=== up! ===');
+			if(this.currentIdx_[fName]>0)
+				this.currentIdx_[fName]--;
+		}
+		if(keyCode == 40){
+			//console.log('=== down! ===');
+			if(this.currentIdx_[fName] < this.myWords_[fName].length-1){
+				this.currentIdx_[fName]++;
+			}
+			else if(this.currentIdx_[fName] == this.myWords_[fName].length-1){
+				//console.log('End of conv');
+				this.currentIdx_[fName]++;
+				this.$currentChatDOM.val('');
+				return
+			}
+		}
+		var currentIdx = this.currentIdx_[fName]; // Get sentence index
+		var appendWords = this.myWords_[fName][currentIdx]; // Get sentence words
+		this.$currentChatDOM.val(appendWords); // Append words into conversation dialog		
+	},
+	init: function(resetIdx){
+		console.log('=== init!! ===');
+		var fName = this.get_fName_();  // Get fName
+		this.myWords_[fName] = [];  // initialize the conversation array
+		// get all DOM in ".conversation"
+		var $conDOM =  this.$currentChatDOM.parent().parent().prev().find('div.conversation').children();
+		// retrive conversation text
+		var words = [];
+		$conDOM.each(function(idx,el){
+			var $curConv = $(el);
+			if($curConv.hasClass('fbChatConvItem')){ // is conversation item or not
+				// judge self-sentences => '#' is the conversation speak by self
+				var whoSpeak = $curConv.find('div._50ke').find('a.profileLink').attr('href');
+				if (whoSpeak == '#'){
+					//Get conversation words
+					$curConv.find('div.messages').children().each(function(idx2,el2){
+						var text = $(el2).find('span.null').html();
+						text = text.split('</span>')[0].replace('<span class="emoticon_text" aria-hidden="true">','');
+						words.push(text);
+					});
+				}
+			}
+		});
+		this.myWords_[fName] = words;
+		// update index only when... 1.never set it yet  2. keyboard insert "Enter"
+		if(typeof this.currentIdx_[fName] == 'undefined' || resetIdx == true)
+			this.currentIdx_[fName] = words.length;
+		
+		console.log(this.myWords_[fName]);
+	},
+	newline: function(){
+
+	},
+	get_fName_: function(){
+		return this.$currentChatDOM.parent().parent()
+					.prev().prev().prev()
+					.find('a.titlebarText').attr('href').split('facebook.com/')[1];
+	}
+};

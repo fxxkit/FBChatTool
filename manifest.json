@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
 
-  "name": "FBDragger",
-  "description": "Make the facebook element draggable",
+  "name": "FBChatTool",
+  "description": "Provide delicious features for Facebook chatroom",
   "version": "1.0",
    "background": {
       "persistent":false,
