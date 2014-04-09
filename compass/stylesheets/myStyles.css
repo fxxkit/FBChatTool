@@ -4,9 +4,15 @@
   z-index: 99999999;
   width: 40px;
   left: 110px;
+  visibility: hidden;
 }
 
-/* line 9, ../sass/myStyles.sass */
+/* line 12, ../sass/myStyles.sass */
+.fbDockChatTabFlyout:hover .FB-chat-drag-btn {
+  visibility: visible;
+}
+
+/* line 15, ../sass/myStyles.sass */
 .fb-chat-fake-border {
   position: absolute;
   top: 16px;
