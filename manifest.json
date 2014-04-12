@@ -7,13 +7,20 @@
    "background": {
       "persistent":false,
       "scripts": ["background.js"]
-    }, 
+    },
+  "browser_action": {
+      "default_icon": {                    // optional
+        //"19": "images/icon19.png",           // optional
+        //"38": "images/icon38.png"            // optional
+      },
+      "default_title": "Show  Chat!"
+    },     
   "content_scripts": [
-    {
+   {
       "matches": ["*://www.facebook.com/*"],
       "css": ["compass/stylesheets/myStyles.css","css/bootstrap-buttons-modify.css"],
       "js": ["js/jquery-2.1.0.min.js","js/jquery-ui-1.10.4.custom.min.js", "js/underscore-min.js","contentScript.js"]
     }
   ],
-  "permissions": ["storage"]  
+  "permissions": ["storage","activeTab"]  
 }

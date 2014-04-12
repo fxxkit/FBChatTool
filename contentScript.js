@@ -1,20 +1,31 @@
 $(function(){
 	console.log('This is FBDragger!!');
+	init(); // Initialize FB_ChatRoomReplay & FB_ChatRoomDragger class
+});
 
+function init(){
 	// Initialize the opened chat room
+	console.log('===init FB dragger===');
 	FB_ChatRoomDragger.appendBtn();
 	FB_ChatRoomDragger.bindDragEvent();
+
+	console.log('===init FB replay===');
+	delay_ReplayComp(); // init FB_ChatRoomReplay when document ready
 
 	// Append btn & Bind Event when click side friend
 	$('.fbChatSidebarBody').on('click',function(){
 		console.log('click side friends for chat room');
 		delayInit_Dragger(1500,2000);
+		var delayBindEvent_Replay = _.bind(delay_ReplayComp);
+	    _.delay(delayBindEvent_Replay,1500);		
 	});
 
 	// Append btn & Bind Event when click top friend
 	$('.jewelContent').on('click',function(){
 		console.log('click top friends for chat room');
-		delayInit_Dragger(1500,2000);			
+		delayInit_Dragger(1500,2000);
+		var delayBindEvent_Replay = _.bind(delay_ReplayComp);
+	    _.delay(delayBindEvent_Replay,1500);			
 	});
 
 	// Listen the msg from friends
@@ -26,13 +37,13 @@ $(function(){
 			if( now_unreadMsgCount != unreadMsgCount){
 				console.log('add btn (trigger by msg from friends)');
 				delayInit_Dragger(1500,2000);
+				var delayBindEvent_Replay = _.bind(delay_ReplayComp);
+	    		_.delay(delayBindEvent_Replay,1500);
 			}
 			unreadMsgCount = now_unreadMsgCount;			
 		}
-	});
-	// Initialize replay class
-	init_Replay();
-});
+	});	
+}
 
 function delayInit_Dragger(append_btn_delay, bind_event_delay){
 	var delayAppendBtn = _.bind(FB_ChatRoomDragger.appendBtn, FB_ChatRoomDragger);
@@ -43,27 +54,34 @@ function delayInit_Dragger(append_btn_delay, bind_event_delay){
 
 }
 
-function init_Replay(){
-	// Listen keyboard arrow event
-	$('.uiTextareaAutogrow').on('keydown',function(event){
-		var $currentChatDOM = $(this);
+function delay_ReplayComp(){
+	$('.uiTextareaAutogrow').each(function(idx,DOMObj){
+		// unbind the existing event
+		$(DOMObj).off('keydown.chatRoomReplay');
+		$(DOMObj).off('focus.chatRoomReplay');
 
-		FB_ChatRoomReplay.$currentChatDOM = $currentChatDOM;
-		if(event.keyCode == 13){
-			//FB_ChatRoomReplay.newline();
-			FB_ChatRoomReplay.init(true);			
-		}
-		if(event.keyCode == 38 || event.keyCode == 40){
-			FB_ChatRoomReplay.getWords(event.keyCode);
-		}
-	});
-	$('.uiTextareaAutogrow').on('focus',function(){
-		var $currentChatDOM = $(this);
-		FB_ChatRoomReplay.$currentChatDOM = $currentChatDOM;
-		FB_ChatRoomReplay.init(false);
-	});
+		// Listen keyboard arrow event
+		$(DOMObj).on('keydown.chatRoomReplay',function(event){
+			var $currentChatDOM = $(this);
+			FB_ChatRoomReplay.$currentChatDOM = $currentChatDOM;
+			if(event.keyCode == 13){
+				FB_ChatRoomReplay.init(true);			
+			}
+			if(event.keyCode == 38 || event.keyCode == 40){
+				FB_ChatRoomReplay.getWords(event.keyCode);
+			}
+		});
+		$(DOMObj).on('focus.chatRoomReplay',function(){
+			var $currentChatDOM = $(this);
+			FB_ChatRoomReplay.$currentChatDOM = $currentChatDOM;
+			FB_ChatRoomReplay.init(false);
+		});
+	});	
 }
 
+/*
+@ Class for draggable chat room
+*/
 var FB_ChatRoomDragger = {
 	preX_offset_: 0,
 	appendBtn: function(){
@@ -87,7 +105,7 @@ var FB_ChatRoomDragger = {
 			//Get conversation id & Set previous height
 			try{
 				var cID = $(currentChatDOM).find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1];
-				//console.log(cID);
+				console.log(cID);
 				chrome.storage.local.get(function(obj){
 					var data = obj[cID];
 
@@ -181,39 +199,42 @@ var FB_ChatRoomDragger = {
 	}
 };
 
+/*
+@ Class for replay sentence
+*/
 var FB_ChatRoomReplay = {
-	myWords_: {}, // {'fName':[sentence... ],...}
-	currentIdx_: {}, // {'fName': currentIdx,...}
+	myWords_: {}, // {'fID':[sentence... ],...}
+	currentIdx_: {}, // {'fID': currentIdx,...}
 	$prevChatDOM_: NaN,
 	$currentChatDOM: NaN,
 	getWords: function(keyCode){
-		var fName = this.get_fName_();  // Get fName		
+		var fID = this.get_fID_();  // Get fID		
 		// Update sentence index
 		if(keyCode == 38){
 			//console.log('=== up! ===');
-			if(this.currentIdx_[fName]>0)
-				this.currentIdx_[fName]--;
+			if(this.currentIdx_[fID]>0)
+				this.currentIdx_[fID]--;
 		}
 		if(keyCode == 40){
 			//console.log('=== down! ===');
-			if(this.currentIdx_[fName] < this.myWords_[fName].length-1){
-				this.currentIdx_[fName]++;
+			if(this.currentIdx_[fID] < this.myWords_[fID].length-1){
+				this.currentIdx_[fID]++;
 			}
-			else if(this.currentIdx_[fName] == this.myWords_[fName].length-1){
+			else if(this.currentIdx_[fID] == this.myWords_[fID].length-1){
 				//console.log('End of conv');
-				this.currentIdx_[fName]++;
+				this.currentIdx_[fID]++;
 				this.$currentChatDOM.val('');
 				return
 			}
 		}
-		var currentIdx = this.currentIdx_[fName]; // Get sentence index
-		var appendWords = this.myWords_[fName][currentIdx]; // Get sentence words
+		var currentIdx = this.currentIdx_[fID]; // Get sentence index
+		var appendWords = this.myWords_[fID][currentIdx]; // Get sentence words
 		this.$currentChatDOM.val(appendWords); // Append words into conversation dialog		
 	},
 	init: function(resetIdx){
 		console.log('=== init!! ===');
-		var fName = this.get_fName_();  // Get fName
-		this.myWords_[fName] = [];  // initialize the conversation array
+		var fID = this.get_fID_();  // Get fID
+		this.myWords_[fID] = [];  // initialize the conversation array
 		// get all DOM in ".conversation"
 		var $conDOM =  this.$currentChatDOM.parent().parent().prev().find('div.conversation').children();
 		// retrive conversation text
@@ -226,26 +247,44 @@ var FB_ChatRoomReplay = {
 				if (whoSpeak == '#'){
 					//Get conversation words
 					$curConv.find('div.messages').children().each(function(idx2,el2){
-						var text = $(el2).find('span.null').html();
-						text = text.split('</span>')[0].replace('<span class="emoticon_text" aria-hidden="true">','');
+						var text = $(el2).find('span.null').html(); //Extract sentence			
+						text = text.split('</span>')[0]
+								.replace('<span class="emoticon_text" aria-hidden="true">',''); // Extract emotion character
 						words.push(text);
+						if(words.length > 50) // keep the array length as 50
+							words.shift();
 					});
 				}
 			}
 		});
-		this.myWords_[fName] = words;
+		this.myWords_[fID] = words;
 		// update index only when... 1.never set it yet  2. keyboard insert "Enter"
-		if(typeof this.currentIdx_[fName] == 'undefined' || resetIdx == true)
-			this.currentIdx_[fName] = words.length;
+		if(typeof this.currentIdx_[fID] == 'undefined' || resetIdx == true)
+			this.currentIdx_[fID] = words.length;
 		
-		console.log(this.myWords_[fName]);
+		console.log(this.myWords_[fID]);
 	},
-	newline: function(){
-
-	},
-	get_fName_: function(){
+	get_fID_: function(){
 		return this.$currentChatDOM.parent().parent()
 					.prev().prev().prev()
-					.find('a.titlebarText').attr('href').split('facebook.com/')[1];
+					.find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1];
+	},
+	get_fID: function(DOMObj){
+		return $(DOMObj).parent().parent()
+					.prev().prev().prev()
+					.find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1];
 	}
+};
+
+/*
+@ Class for cross site chat room(CSCR)
+*/
+var FB_CrossSiteChatRoom = {
+	/*
+	Send msg
+	Receive msg
+	Append CSCR (via click btn)
+		- remember to clear the old chat room first
+		- pass the css to the CSCR
+	*/
 };
