@@ -1,6 +1,7 @@
 $(function(){
 	console.log('This is FBDragger!!');
 	init(); // Initialize FB_ChatRoomReplay & FB_ChatRoomDragger class
+	//CSCR_Init();
 });
 
 function init(){
@@ -42,6 +43,8 @@ function init(){
 			}
 			unreadMsgCount = now_unreadMsgCount;			
 		}
+		//chrome.runtime.sendMessage("Echo Testing!!!!!!");
+		FB_CrossSiteChatRoom.sendTo_bg();
 	});	
 }
 
@@ -105,7 +108,7 @@ var FB_ChatRoomDragger = {
 			//Get conversation id & Set previous height
 			try{
 				var cID = $(currentChatDOM).find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1];
-				console.log(cID);
+				//console.log(cID);
 				chrome.storage.local.get(function(obj){
 					var data = obj[cID];
 
@@ -262,19 +265,27 @@ var FB_ChatRoomReplay = {
 		if(typeof this.currentIdx_[fID] == 'undefined' || resetIdx == true)
 			this.currentIdx_[fID] = words.length;
 		
-		console.log(this.myWords_[fID]);
+		//console.log(this.myWords_[fID]);
 	},
 	get_fID_: function(){
+		// .fbNubFlyoutTitlebar -> li.uiMenuItem -> a.itemAnchor
 		return this.$currentChatDOM.parent().parent()
-					.prev().prev().prev()
-					.find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1];
-	},
-	get_fID: function(DOMObj){
-		return $(DOMObj).parent().parent()
 					.prev().prev().prev()
 					.find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1];
 	}
 };
+
+
+chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse){
+	//console.log('====msg===');
+	//console.log(msg);
+	//console.log('====sender====');
+	//console.log(sender);
+	if(msg.HEAD == 'query_init_from_FB')
+		FB_CrossSiteChatRoom.initTo_bg();
+	if(msg.HEAD == 'new_msg_from_CR')
+		FB_CrossSiteChatRoom.receiveFrom_bg(msg);
+});
 
 /*
 @ Class for cross site chat room(CSCR)
@@ -282,9 +293,107 @@ var FB_ChatRoomReplay = {
 var FB_CrossSiteChatRoom = {
 	/*
 	Send msg
+		- bind event on message change (new msg)
 	Receive msg
+		- bind event on 
 	Append CSCR (via click btn)
 		- remember to clear the old chat room first
 		- pass the css to the CSCR
 	*/
+	initData: {},
+	newMsgData: {},	
+	/*
+	@ Initialize => send all the opened chat room msg to background
+	@ initData : {'fID':{'fName': name,
+						 'profilePhoto': src,
+						 'msg': [ {'speaker': [sentences, ...]}, ...] // speaker = me or you
+						 },		
+					...
+				 }
+	*/
+	initTo_bg: function(){
+		this.init_msg_parser_();
+		chrome.runtime.sendMessage({HEAD:'init_from_FB', Data:this.initData});
+	},
+	/*
+	@ Send new message to background
+	@ newMsgData : {'fID':[...]}
+	*/
+	sendTo_bg: function(){
+		chrome.runtime.sendMessage({HEAD:'new_msg_from_FB',Data: 'contenScript sendTo_bg() Testing!!!'});
+	},
+	receiveFrom_bg: function(msg){
+		console.log('receive new messge from background(CR)');
+		console.log(msg);
+	},
+	/*
+	@ Retrive all opened chat room msg & update the initData
+	@ Remember to do
+		- Photo msg
+		- Emotion (character) msg
+		- profile photo picture
+	*/
+	init_msg_parser_: function(){
+		var initDataTmp = {};
+		$('.fbDockChatTabFlyout').each(function(idx,eachChatRoom){
+			/*
+			@ Get fID (.fbNubFlyoutTitlebar -> li.uiMenuItem -> a.itemAnchor)
+			@ .fbNubFlyoutTitlebar(1)
+				|- li.uiMenuItem (n) => $.eq(0)
+					|- a.itemAnchor(1) => $.('href') --> The FB ID
+			*/
+			var fID = $(eachChatRoom).find('.fbNubFlyoutTitlebar').find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1];
+			initDataTmp[fID] = {};
+			//console.log(fID);
+
+			//@ Get fName
+			var fName = $(eachChatRoom).find('.titlebarText').html();
+			initDataTmp[fID]['fName'] = fName;
+			//console.log(fName);
+
+			//@ Get profile photo (continue get until the url is not '/images/spacer.gif')
+			var profilePhoto = '/images/spacer.gif'; // default hidden profile img on FB
+			var breakFlag = false;
+			var searchIdx = 0;
+			$(eachChatRoom).find('.profilePhoto').each(function(i,o){
+				if($(o).attr('src') != '/images/spacer.gif'){
+					profilePhoto = $(o).attr('src')
+					return false; // break the each
+				}
+			});
+			initDataTmp[fID]['profilePhoto'] = profilePhoto;	
+			//console.log(profilePhoto);
+
+			/*
+			@ Get conversation message
+			@ div.fbChatConvItem(n)
+				|- div._50ke(1)
+				|	|- a.profileLink => $.attr('href') --> who speak
+				|- div.messages(1)
+					|- div.direction_ltr(n)
+						|- span.null => $.html() -->  message	
+			*/
+			initDataTmp[fID]['msg'] = [];
+			$(eachChatRoom).find('div.fbChatConvItem').each(function(i,o){
+				var whoSpeak = $(o).find('div._50ke').find('a.profileLink').attr('href');
+				if(whoSpeak == '#')
+					whoSpeak = 'me';
+				else
+					whoSpeak = 'you';
+				//console.log('whoSpeak: ' + whoSpeak);
+				var sentenceArry = [];
+				$(o).find('div.messages').find('div.direction_ltr').each(function(i2,o2){
+					var sentence = $(o2).find('span.null').html();
+					sentenceArry.push(sentence);
+					//console.log(sentence);
+				})
+				var msgEl = {};
+				msgEl[whoSpeak] = sentenceArry;
+				initDataTmp[fID]['msg'].push(msgEl);
+			});
+		});
+		// Update the initData
+		this.initData = initDataTmp;
+		console.log(this.initData);
+	}
 };

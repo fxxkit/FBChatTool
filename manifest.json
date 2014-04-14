@@ -22,5 +22,5 @@
       "js": ["js/jquery-2.1.0.min.js","js/jquery-ui-1.10.4.custom.min.js", "js/underscore-min.js","contentScript.js"]
     }
   ],
-  "permissions": ["storage","activeTab"]  
+  "permissions": ["storage","activeTab","tabs"]  
 }
