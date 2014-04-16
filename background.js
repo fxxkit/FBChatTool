@@ -64,10 +64,7 @@ var FB_CrossSiteChatRoom_BG = {
 			if(hasFBTab == false)
 				alert('You have to open the Facebook first!!');
 		});
-	},
-	receiveFrom_FB: function(){
-
-	},
+	},	
 	initTo_CSCR: function(msg){
 		//console.log(FB_CrossSiteChatRoom_BG.test);
 		var thisTabID;
@@ -87,7 +84,7 @@ var FB_CrossSiteChatRoom_BG = {
 						console.log(FB_CrossSiteChatRoom_BG.initializedTab);						
 						// Send init chat room msg
 						chrome.tabs.sendMessage(thisTabID, msg, function(response) {
-							// this callback would not execute if no response from CR
+							// this callback would "not" execute if no response from cross site
 							console.log('===[initTo_CSCR()]: receive response from cross site ===');
 						});
 					});
@@ -101,7 +98,10 @@ var FB_CrossSiteChatRoom_BG = {
 			chrome.tabs.sendMessage(FB_CrossSiteChatRoom_BG.initializedTab[i],msg);
 		}
 	},
+	receiveFrom_FB: function(){
+		// No use currently!
+	},
 	receiveFrom_CSCR: function(){
-
+		// No use currently!
 	}
 }
