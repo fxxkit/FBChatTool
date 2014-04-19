@@ -1,0 +1,190 @@
+/* line 6, ../sass/CSCR.sass */
+body {
+  background: white;
+}
+
+/* line 26, ../sass/CSCR.sass */
+#CSCR-container {
+  font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+  font-size: 14px;
+  background: white;
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  z-index: 999999;
+}
+/* line 35, ../sass/CSCR.sass */
+#CSCR-container .CSCR-outter-wrap {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #c9c9c9;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  float: right;
+  width: 260px;
+  height: 284px;
+  margin-right: 10px;
+}
+
+/* line 43, ../sass/CSCR.sass */
+.CSCR-title-bar-wrap {
+  width: 100%;
+  height: 28px;
+  background: #3b5998;
+  position: relative;
+  line-height: 28px;
+}
+/* line 49, ../sass/CSCR.sass */
+.CSCR-title-bar-wrap:hover {
+  background: #4d68a2;
+}
+/* line 51, ../sass/CSCR.sass */
+.CSCR-title-bar-wrap .CSCR-title-bar-text {
+  position: absolute;
+  color: white;
+  float: left;
+  left: 5px;
+}
+/* line 56, ../sass/CSCR.sass */
+.CSCR-title-bar-wrap .CSCR-close-btn {
+  font-weight: bold;
+  position: absolute;
+  color: #bac7e0;
+  right: 5px;
+  cursor: pointer;
+}
+/* line 62, ../sass/CSCR.sass */
+.CSCR-title-bar-wrap .CSCR-close-btn:hover {
+  color: white;
+}
+
+/* line 65, ../sass/CSCR.sass */
+.title-bar-hightlight {
+  background: #4d68a2;
+}
+
+/* line 68, ../sass/CSCR.sass */
+.CSCR-msg-dialog-wrap {
+  width: 100%;
+  height: 228px;
+  max-height: 228px;
+  background: #edeff4;
+}
+/* line 78, ../sass/CSCR.sass */
+.CSCR-msg-dialog-wrap .CSCR-sntce-you .CSCR-profile-photo {
+  margin: 2px;
+}
+/* line 83, ../sass/CSCR.sass */
+.CSCR-msg-dialog-wrap .CSCR-sntce-you .CSCR-sntce {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #c9c9c9;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  line-height: 18px;
+  padding-left: 5px;
+  padding-right: 5px;
+  width: auto;
+  word-wrap: break-word;
+  word-break: break-all;
+  display: inline-block;
+  position: relative;
+  background: white;
+  margin-left: 6px;
+  margin-right: 10px;
+}
+/* line 91, ../sass/CSCR.sass */
+.CSCR-msg-dialog-wrap .CSCR-sntce-you .CSCR-sntce:after, .CSCR-msg-dialog-wrap .CSCR-sntce-you .CSCR-sntce:before {
+  top: 4px;
+  right: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+/* line 100, ../sass/CSCR.sass */
+.CSCR-msg-dialog-wrap .CSCR-sntce-you .CSCR-sntce:after {
+  border-color: rgba(136, 183, 213, 0);
+  border-right-color: white;
+  border-width: 5px;
+}
+/* line 104, ../sass/CSCR.sass */
+.CSCR-msg-dialog-wrap .CSCR-sntce-you .CSCR-sntce:before {
+  border-color: rgba(194, 225, 245, 0);
+  border-right-color: #c9c9c9;
+  border-width: 6px;
+  margin-top: -1px;
+}
+/* line 111, ../sass/CSCR.sass */
+.CSCR-msg-dialog-wrap .CSCR-sntce-me .CSCR-sntce {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #c9c9c9;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  line-height: 18px;
+  padding-left: 5px;
+  padding-right: 5px;
+  width: auto;
+  word-wrap: break-word;
+  word-break: break-all;
+  display: inline-block;
+  float: right;
+  position: relative;
+  background: #c7defe;
+  margin-left: 15px;
+  margin-right: 10px;
+}
+/* line 120, ../sass/CSCR.sass */
+.CSCR-msg-dialog-wrap .CSCR-sntce-me .CSCR-sntce:after, .CSCR-msg-dialog-wrap .CSCR-sntce-me .CSCR-sntce:before {
+  top: 4px;
+  left: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+/* line 129, ../sass/CSCR.sass */
+.CSCR-msg-dialog-wrap .CSCR-sntce-me .CSCR-sntce:after {
+  border-color: rgba(136, 183, 213, 0);
+  border-left-color: #c7defe;
+  border-width: 5px;
+}
+/* line 133, ../sass/CSCR.sass */
+.CSCR-msg-dialog-wrap .CSCR-sntce-me .CSCR-sntce:before {
+  border-color: rgba(194, 225, 245, 0);
+  border-left-color: #c9c9c9;
+  border-width: 6px;
+  margin-top: -1px;
+}
+
+/* line 139, ../sass/CSCR.sass */
+.CSCR-input-wrap {
+  background: red;
+  height: 28px;
+}
+/* line 142, ../sass/CSCR.sass */
+.CSCR-input-wrap .CSCR-input-bar {
+  width: 100%;
+  height: 100%;
+}

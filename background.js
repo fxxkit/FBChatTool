@@ -90,6 +90,13 @@ var FB_CrossSiteChatRoom_BG = {
 					});
 				});		
 			}
+			else{ // send message to re-initialize
+				msg.HEAD = 're_initialize';
+				chrome.tabs.sendMessage(thisTabID, msg, function(response) {
+					// this callback would "not" execute if no response from cross site
+					console.log('===[initTo_CSCR()]: receive response from cross site ===');
+				});				
+			}
 		});
 	},
 	sendTo_CSCR: function(msg){

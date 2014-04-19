@@ -2,10 +2,17 @@ console.log('This is CSCR.js');
 
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse){	
 	console.log(msg);
+	console.log(JSON.stringify(msg));
+
 	if(msg.HEAD == 'init_from_FB')
 		FB_CrossSiteChatRoom_CR.receiveInitFrom_bf(msg.Data);
 	if(msg.HEAD == 'new_msg_from_FB')
 		FB_CrossSiteChatRoom_CR.receiveFrom_bg(msg.Data);
+	if(msg.HEAD == 're_initialize'){
+		// Remember to clear container first
+		FB_CrossSiteChatRoom_CR.receiveInitFrom_bf(msg.Data);		
+	}
+
 	//if(msg.HEAD == 'new_msg_from_CR')
 	//	FB_CrossSiteChatRoom_CR.sendTo_bg()
 });
