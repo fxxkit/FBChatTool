@@ -95,7 +95,7 @@ function init(){
 		}
 		//chrome.runtime.sendMessage("Echo Testing!!!!!!");
 		var delaySendTo_bg_scan = _.bind(FB_CrossSiteChatRoom.sendTo_bg_scan, FB_CrossSiteChatRoom);
-    	_.delay(delaySendTo_bg_scan,1500);		
+    	_.delay(delaySendTo_bg_scan,500);		
 		//FB_CrossSiteChatRoom.sendTo_bg_scan();
 	});	
 }
@@ -396,7 +396,7 @@ var FB_CrossSiteChatRoom = {
 		//console.log(this.newMsgData);
 		//console.log('=== sendTo_bg ===');
 		var $fbDockChatTabFlyout_cur = $currentChatDOM.parent().parent().parent().parent().parent();
-		var msgObj = FB_CrossSiteChatRoom.new_msg_parser_by_return($fbDockChatTabFlyout_cur);				
+		var msgObj = FB_CrossSiteChatRoom.new_msg_parser($fbDockChatTabFlyout_cur);				
 
 		chrome.runtime.sendMessage({HEAD:'new_msg_from_FB',Data: msgObj},function(response){
 			//Response call back function!
@@ -406,11 +406,10 @@ var FB_CrossSiteChatRoom = {
 		console.log('=== sendTo_bg_with_Scan ===');
 		//var delaySendTo_bg_scan = _.bind(FB_CrossSiteChatRoom.sendTo_bg_delay_scan_comp_, FB_CrossSiteChatRoom);
     	//_.delay(delaySendTo_bg_scan,1500);
-    	//FB_CrossSiteChatRoom.sendTo_bg_delay_scan_comp_();
 		$('.fbDockChatTabFlyout').each(function(idx,el){
 			if($(el).parent().hasClass('highlightTab')){
 				console.log('Here is sendTo_bg_scan');
-				var msgObj = FB_CrossSiteChatRoom.new_msg_parser_by_return($(el));				
+				var msgObj = FB_CrossSiteChatRoom.new_msg_parser($(el));				
 				console.log(msgObj);
 				if (msgObj != null){
 					chrome.runtime.sendMessage({HEAD:'new_msg_from_FB',Data: msgObj},function(response){
@@ -514,30 +513,7 @@ var FB_CrossSiteChatRoom = {
 		this.initData = initDataTmp;
 		console.log(this.initData);
 	},
-	new_msg_parser_: function($currentChatDOM){
-		var $fbDockChatTabFlyout_cur = $currentChatDOM.parent().parent().parent().parent().parent();
-		
-		//@ Get fID
-		var fID = this.get_fID_($fbDockChatTabFlyout_cur);
-		console.log(fID);
-		FB_CrossSiteChatRoom.newMsgData[fID] = {};
-
-		var fName = this.get_fName_($fbDockChatTabFlyout_cur);
-		console.log(fName);
-		FB_CrossSiteChatRoom.newMsgData[fID]['fName'] = fName;
-
-		var profilePhoto = this.get_profilePhoto_($fbDockChatTabFlyout_cur);
-		console.log(profilePhoto);
-		FB_CrossSiteChatRoom.newMsgData[fID]['profilePhoto'] = profilePhoto;
-
-		//@ Get new msg
-		FB_CrossSiteChatRoom.newMsgData[fID]['msg'] = new Array(); // Initialize
-		FB_CrossSiteChatRoom.delay_extractNewMsg_($fbDockChatTabFlyout_cur,fID);
-		//var delayExtractMsg = _.bind(FB_CrossSiteChatRoom.delay_extractNewMsg_, FB_CrossSiteChatRoom);
-    	//_.delay(delayExtractMsg,1500,$fbDockChatTabFlyout_cur,fID);
-			
-	},
-	new_msg_parser_by_return: function($fbDockChatTabFlyout){
+	new_msg_parser: function($fbDockChatTabFlyout){
 		var returnObj = {}
 		var fID = FB_CrossSiteChatRoom.get_fID_($fbDockChatTabFlyout);
 		returnObj[fID] = {};
@@ -548,7 +524,7 @@ var FB_CrossSiteChatRoom = {
 		var profilePhoto = FB_CrossSiteChatRoom.get_profilePhoto_($fbDockChatTabFlyout);
 		returnObj[fID]['profilePhoto'] = profilePhoto;
 
-		returnObj[fID]['msg'] =  FB_CrossSiteChatRoom.delay_extractNewMsg_by_return($fbDockChatTabFlyout,fID);
+		returnObj[fID]['msg'] =  FB_CrossSiteChatRoom.extractNewMsg($fbDockChatTabFlyout,fID);
 		//console.log(returnObj);
 		if (returnObj[fID]['msg'].length > 0)
 			return returnObj;
@@ -592,40 +568,7 @@ var FB_CrossSiteChatRoom = {
 		});
 		return profilePhoto;
 	},
-	delay_extractNewMsg_: function($fbDockChatTabFlyout,fID){
-		//var fID = this.get_fID_($fbDockChatTabFlyout);
-		$fbDockChatTabFlyout.find('div.fbChatConvItem').each(function(i,o){
-				var whoSpeak = $(o).find('div._50ke').find('a.profileLink').attr('href');
-				if(whoSpeak == '#')
-					whoSpeak = 'me';
-				else
-					whoSpeak = 'you';
-				//console.log('whoSpeak: ' + whoSpeak);
-				var sentenceArry = [];
-				$(o).find('div.messages').eq(0).find('div.direction_ltr').each(function(i2,o2){
-					// Mark the sentence as sended => for easy to extract new msg
-					if(!$(this).hasClass('CSCR_sended')){						
-						var sentence = $(o2).find('span.null').html();
-						sentenceArry.push(sentence);
-						//console.log(sentence);
-						$(this).addClass('CSCR_sended');
-						console.log(sentenceArry);
-					}
-				});
-				if(sentenceArry.length != 0){
-					var msgEl = {};
-					msgEl[whoSpeak] = sentenceArry;
-					console.log(msgEl);
-					FB_CrossSiteChatRoom.newMsgData[fID]['msg'].push(msgEl);
-					console.log(FB_CrossSiteChatRoom.newMsgData[fID]['msg']);
-					console.log(FB_CrossSiteChatRoom.newMsgData);
-					console.log(FB_CrossSiteChatRoom.newMsgData[fID]);
-
-				}								
-				//$(this).addClass('CSCR_sended');					
-		});
-	},
-	delay_extractNewMsg_by_return: function($fbDockChatTabFlyout,fID){
+	extractNewMsg: function($fbDockChatTabFlyout,fID){
 		//var fID = this.get_fID_($fbDockChatTabFlyout);
 		var returnMsgArray = new Array();
 		$fbDockChatTabFlyout.find('div.fbChatConvItem').each(function(i,o){
