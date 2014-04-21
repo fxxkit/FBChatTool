@@ -25,17 +25,17 @@ body
 
 #CSCR-container
 	font-family: "lucida grande",tahoma,verdana,arial,sans-serif
-	font-size: 14px
-	
+	font-size: 14px	
 	background: white
-	position: absolute
+	position: fixed
 	bottom: 0
 	right: 10px
 	z-index: 999999
 	.CSCR-outter-wrap
 		+FB-border()
 		+border-radius(5px)
-		float: right
+		//float: right
+		display: inline-block
 		width: 260px
 		height: 284px
 		margin-right: 10px 
@@ -46,6 +46,7 @@ body
 	background: #3b5998
 	position: relative
 	line-height: 28px
+	cursor: pointer
 	&:hover
 		background: #4d68a2
 	.CSCR-title-bar-text
@@ -135,6 +136,32 @@ body
 				border-left-color: #c9c9c9
 				border-width: 6px
 				margin-top:  -1px			
+
+.CSCR-msg-dialog-table
+	tr
+		td:nth-child(1)
+			width: 40px
+		td:nth-child(2)
+			width: 220px
+
+.CR-shrinked
+	width: 160px
+	height: 28px
+	display: inline-block
+	margin-right: 10px 
+	//position: inherit
+	//bottom: 0px
+	//float: right
+	//margin-right: 50px 
+	.CSCR-title-bar-wrap
+		+FB-border()
+		background: #e9eaed
+		.CSCR-title-bar-text
+			color: black
+	.CSCR-msg-dialog-wrap
+		display: none
+	.CSCR-input-wrap
+		display: none	
 
 .CSCR-input-wrap
 	background: red

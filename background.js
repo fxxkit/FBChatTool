@@ -76,18 +76,25 @@ var FB_CrossSiteChatRoom_BG = {
 				// Inject jQuery
 				chrome.tabs.executeScript(null, {file: "js/jquery-2.1.0.min.js"},function(){
 					console.log('Inject jQuery');
-					// Inject CSCR.js
-					chrome.tabs.executeScript(null, {file: "CSCR.js"},function(){
-						console.log('Inject CSCR.js');
-						//Update initialized tab array
-						FB_CrossSiteChatRoom_BG.initializedTab.push(thisTabID);
-						console.log(FB_CrossSiteChatRoom_BG.initializedTab);						
-						// Send init chat room msg
-						chrome.tabs.sendMessage(thisTabID, msg, function(response) {
-							// this callback would "not" execute if no response from cross site
-							console.log('===[initTo_CSCR()]: receive response from cross site ===');
+					// Inject slimscroll.js
+					chrome.tabs.executeScript(null,{file: "js/jquery.slimscroll.min.js"},function(){
+						console.log('Inject slimscroll.js');
+						// Inject CSCR.css
+						chrome.tabs.insertCSS(null,{file: "compass/stylesheets/CSCR.css"},function(){
+							// Inject CSCR.js
+							chrome.tabs.executeScript(null, {file: "CSCR.js"},function(){
+								console.log('Inject CSCR.js');
+								//Update initialized tab array
+								FB_CrossSiteChatRoom_BG.initializedTab.push(thisTabID);
+								console.log(FB_CrossSiteChatRoom_BG.initializedTab);						
+								// Send init chat room msg
+								chrome.tabs.sendMessage(thisTabID, msg, function(response) {
+									// this callback would "not" execute if no response from cross site
+									console.log('===[initTo_CSCR()]: receive response from cross site ===');
+								});
+							});	
 						});
-					});
+					});					
 				});		
 			}
 			else{ // send message to re-initialize

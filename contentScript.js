@@ -2,6 +2,53 @@ $(function(){
 	console.log('This is FBDragger!!');
 	init(); // Initialize FB_ChatRoomReplay & FB_ChatRoomDragger class
 	//CSCR_Init();
+	$('<button/>').addClass('testing-trigger-btn').css({'position': 'absolute', 'z-index': 999999999}).prependTo('body');
+	$('.testing-trigger-btn').on('click.testingTrigger',function(){
+		$('.uiTextareaAutogrow').each(function(idx,el){
+			console.log(el);
+			var enterEvent = $.Event("keyup");
+			var enterEvent2 = $.Event("keydown");
+			var enterEvent3 = $.Event("keypress");
+			var enterEvent4 = $.Event("input");
+			var enterEvent5 = $.Event("submit");
+			var focusEvent = $.Event("focus");
+			enterEvent.which = 13;
+			enterEvent.keyCode = 13;
+			enterEvent.namespace_re = '$';
+			console.log(enterEvent);
+
+			enterEvent2.which = 13;
+			enterEvent2.keyCode = 13;
+			enterEvent2.namespace_re = '$';
+			console.log(enterEvent2);
+
+			
+			enterEvent3.which = 13;
+			enterEvent3.keyCode = 13;				
+			enterEvent3.namespace_re = '$';
+
+
+			enterEvent4.namespace_re = '$';
+			enterEvent5.namespace_re = '$';
+
+
+			$(el).trigger(enterEvent);
+			$(el).trigger(enterEvent2);
+			$(el).trigger(enterEvent3);
+			$(el).trigger(enterEvent4);
+			$(el).trigger(enterEvent5);
+			$(el).parent().trigger(enterEvent);
+			$(el).parent().trigger(enterEvent2);
+			$(el).parent().trigger(enterEvent3);
+			$(el).parent().parent().trigger(enterEvent);
+			$(el).parent().parent().trigger(enterEvent2);
+			$(el).parent().parent().trigger(enterEvent3);
+			$(el).trigger(focusEvent).trigger(enterEvent);
+			$(el).trigger(focusEvent).trigger(enterEvent2);
+			$(el).trigger(focusEvent).trigger(enterEvent3);
+
+		});
+	});
 });
 
 function init(){
@@ -47,7 +94,9 @@ function init(){
 			unreadMsgCount = now_unreadMsgCount;			
 		}
 		//chrome.runtime.sendMessage("Echo Testing!!!!!!");
-		FB_CrossSiteChatRoom.sendTo_bg();
+		var delaySendTo_bg_scan = _.bind(FB_CrossSiteChatRoom.sendTo_bg_scan, FB_CrossSiteChatRoom);
+    	_.delay(delaySendTo_bg_scan,1500);		
+		//FB_CrossSiteChatRoom.sendTo_bg_scan();
 	});	
 }
 
@@ -93,6 +142,7 @@ function delay_CSCR_Comp(){
 		$(DOMObj).on('keydown.CSCR',function(event){
 			if(event.keyCode == 13){
 				console.log('==keydown.CSCR==: event trigger');
+				console.log(event);
 				var $currentChatDOM = $(this);			
 				FB_CrossSiteChatRoom.sendTo_bg($currentChatDOM);
 			}
@@ -124,6 +174,7 @@ var FB_ChatRoomDragger = {
 			}
 
 			//Get conversation id & Set previous height
+			/* bug exist
 			try{
 				var cID = $(currentChatDOM).find('li.uiMenuItem').eq(0).find('a.itemAnchor').attr('href').split('/messages/')[1];
 				//console.log(cID);
@@ -151,7 +202,7 @@ var FB_ChatRoomDragger = {
 			}
 			catch(err){
 				//console.log(err);
-			}
+			}*/
 		});
 	},
 
@@ -301,7 +352,7 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse){
 	if(msg.HEAD == 'query_init_from_FB')
 		FB_CrossSiteChatRoom.initTo_bg();
 	if(msg.HEAD == 'new_msg_from_CR')
-		FB_CrossSiteChatRoom.receiveFrom_bg(msg);
+		FB_CrossSiteChatRoom.receiveFrom_bg(msg.Data);
 });
 
 /*
@@ -338,21 +389,65 @@ var FB_CrossSiteChatRoom = {
 	/*
 	@ Send new message to background
 	@ newMsgData : {'fID':[...]}
+	@ $currentChatDOM => .uiTextareaAutogrow
 	*/
 	sendTo_bg: function($currentChatDOM){
-		this.new_msg_parser_($currentChatDOM);
-		console.log(this.newMsgData);
-		chrome.runtime.sendMessage({HEAD:'new_msg_from_FB',Data: this.newMsgData},function(response){
-			//
-			console.log('send new msg to background success!');
-			// Initialize the variable after sending success!
-			FB_CrossSiteChatRoom.newMsgData = {};
-		});
+		//this.new_msg_parser_($currentChatDOM);
+		//console.log(this.newMsgData);
+		//console.log('=== sendTo_bg ===');
+		var $fbDockChatTabFlyout_cur = $currentChatDOM.parent().parent().parent().parent().parent();
+		var msgObj = FB_CrossSiteChatRoom.new_msg_parser_by_return($fbDockChatTabFlyout_cur);				
 
+		chrome.runtime.sendMessage({HEAD:'new_msg_from_FB',Data: msgObj},function(response){
+			//Response call back function!
+		});
 	},
-	receiveFrom_bg: function(msg){
+	sendTo_bg_scan: function(){
+		console.log('=== sendTo_bg_with_Scan ===');
+		//var delaySendTo_bg_scan = _.bind(FB_CrossSiteChatRoom.sendTo_bg_delay_scan_comp_, FB_CrossSiteChatRoom);
+    	//_.delay(delaySendTo_bg_scan,1500);
+    	//FB_CrossSiteChatRoom.sendTo_bg_delay_scan_comp_();
+		$('.fbDockChatTabFlyout').each(function(idx,el){
+			if($(el).parent().hasClass('highlightTab')){
+				console.log('Here is sendTo_bg_scan');
+				var msgObj = FB_CrossSiteChatRoom.new_msg_parser_by_return($(el));				
+				console.log(msgObj);
+				if (msgObj != null){
+					chrome.runtime.sendMessage({HEAD:'new_msg_from_FB',Data: msgObj},function(response){
+						//Response call back function!
+					});						
+				}
+			}
+		});				
+	},
+	receiveFrom_bg: function(Data){
 		console.log('receive new messge from background(CR)');
-		console.log(msg);
+		console.log(Data);
+		var $targetDOM = this.get_DOM_by_fID(Data.fID);
+		console.log($targetDOM);
+		console.log(this.get_fName_($targetDOM));
+		console.log(this.get_fID_($targetDOM));
+		console.log($targetDOM.find('.uiTextareaAutogrow'));
+		
+
+		//var focusEvent = $.
+		var enterEvent = $.Event("keyup.test");
+		var enterEvent2 = $.Event("keydown.test");
+		var enterEvent3 = $.Event("keypress.test");
+		enterEvent.which = 13;
+		enterEvent.keyCode = 13;
+		enterEvent.which2 = 13;
+		enterEvent.keyCode2 = 13;
+		enterEvent.which3 = 13;
+		enterEvent.keyCode3 = 13;				
+		$targetDOM.find('.uiTextareaAutogrow').val(Data.msg);
+		$targetDOM.find('.uiTextareaAutogrow').trigger(enterEvent);
+		$targetDOM.find('.uiTextareaAutogrow').trigger(enterEvent2);
+		$targetDOM.find('.uiTextareaAutogrow').trigger(enterEvent3);
+		$targetDOM.find('.uiTextareaAutogrow').parent().trigger(enterEvent);
+		$targetDOM.find('.uiTextareaAutogrow').parent().trigger(enterEvent2);
+		$targetDOM.find('.uiTextareaAutogrow').parent().trigger(enterEvent3);
+		//$targetDOM.find('uiTextareaAutogrow').html(Data.msg);
 	},
 	/*
 	@ Retrive all opened chat room msg & update the initData
@@ -425,22 +520,40 @@ var FB_CrossSiteChatRoom = {
 		//@ Get fID
 		var fID = this.get_fID_($fbDockChatTabFlyout_cur);
 		console.log(fID);
-		this.newMsgData[fID] = {};
+		FB_CrossSiteChatRoom.newMsgData[fID] = {};
 
 		var fName = this.get_fName_($fbDockChatTabFlyout_cur);
 		console.log(fName);
-		this.newMsgData[fID]['fName'] = fName;
+		FB_CrossSiteChatRoom.newMsgData[fID]['fName'] = fName;
 
 		var profilePhoto = this.get_profilePhoto_($fbDockChatTabFlyout_cur);
 		console.log(profilePhoto);
-		this.newMsgData[fID]['profilePhoto'] = profilePhoto;
+		FB_CrossSiteChatRoom.newMsgData[fID]['profilePhoto'] = profilePhoto;
 
 		//@ Get new msg
-		this.newMsgData[fID]['msg'] = []; // Initialize
-		this.delay_extractNewMsg_($fbDockChatTabFlyout_cur,fID);
+		FB_CrossSiteChatRoom.newMsgData[fID]['msg'] = new Array(); // Initialize
+		FB_CrossSiteChatRoom.delay_extractNewMsg_($fbDockChatTabFlyout_cur,fID);
 		//var delayExtractMsg = _.bind(FB_CrossSiteChatRoom.delay_extractNewMsg_, FB_CrossSiteChatRoom);
     	//_.delay(delayExtractMsg,1500,$fbDockChatTabFlyout_cur,fID);
 			
+	},
+	new_msg_parser_by_return: function($fbDockChatTabFlyout){
+		var returnObj = {}
+		var fID = FB_CrossSiteChatRoom.get_fID_($fbDockChatTabFlyout);
+		returnObj[fID] = {};
+
+		var fName = FB_CrossSiteChatRoom.get_fName_($fbDockChatTabFlyout);
+		returnObj[fID]['fName'] = fName;
+
+		var profilePhoto = FB_CrossSiteChatRoom.get_profilePhoto_($fbDockChatTabFlyout);
+		returnObj[fID]['profilePhoto'] = profilePhoto;
+
+		returnObj[fID]['msg'] =  FB_CrossSiteChatRoom.delay_extractNewMsg_by_return($fbDockChatTabFlyout,fID);
+		//console.log(returnObj);
+		if (returnObj[fID]['msg'].length > 0)
+			return returnObj;
+		else
+			return null
 	},
 	/*
 	@ Get fID (.fbNubFlyoutTitlebar -> li.uiMenuItem -> a.itemAnchor)
@@ -454,6 +567,17 @@ var FB_CrossSiteChatRoom = {
 	//@ Get fName
 	get_fName_: function($fbDockChatTabFlyout){
 		return $fbDockChatTabFlyout.find('.titlebarText').html(); 
+	},
+	get_DOM_by_fID: function(fID){
+		var $targetDOM = null;
+		$('.fbDockChatTabFlyout').each(function(){
+			var current_fID = FB_CrossSiteChatRoom.get_fID_($(this));
+			if(current_fID == fID){
+				$targetDOM = $(this);
+				return false; // break each loop
+			}
+		})
+		return $targetDOM;
 	},
 	//@ Get profile photo (continue get until the url is not '/images/spacer.gif')
 	get_profilePhoto_: function($fbDockChatTabFlyout){
@@ -469,6 +593,7 @@ var FB_CrossSiteChatRoom = {
 		return profilePhoto;
 	},
 	delay_extractNewMsg_: function($fbDockChatTabFlyout,fID){
+		//var fID = this.get_fID_($fbDockChatTabFlyout);
 		$fbDockChatTabFlyout.find('div.fbChatConvItem').each(function(i,o){
 				var whoSpeak = $(o).find('div._50ke').find('a.profileLink').attr('href');
 				if(whoSpeak == '#')
@@ -477,23 +602,58 @@ var FB_CrossSiteChatRoom = {
 					whoSpeak = 'you';
 				//console.log('whoSpeak: ' + whoSpeak);
 				var sentenceArry = [];
-				$(o).find('div.messages').find('div.direction_ltr').each(function(i2,o2){
+				$(o).find('div.messages').eq(0).find('div.direction_ltr').each(function(i2,o2){
 					// Mark the sentence as sended => for easy to extract new msg
 					if(!$(this).hasClass('CSCR_sended')){						
 						var sentence = $(o2).find('span.null').html();
 						sentenceArry.push(sentence);
 						//console.log(sentence);
 						$(this).addClass('CSCR_sended');
+						console.log(sentenceArry);
 					}
 				});
 				if(sentenceArry.length != 0){
 					var msgEl = {};
 					msgEl[whoSpeak] = sentenceArry;
+					console.log(msgEl);
 					FB_CrossSiteChatRoom.newMsgData[fID]['msg'].push(msgEl);
+					console.log(FB_CrossSiteChatRoom.newMsgData[fID]['msg']);
+					console.log(FB_CrossSiteChatRoom.newMsgData);
+					console.log(FB_CrossSiteChatRoom.newMsgData[fID]);
+
 				}								
 				//$(this).addClass('CSCR_sended');					
-					
 		});
-	}
-
+	},
+	delay_extractNewMsg_by_return: function($fbDockChatTabFlyout,fID){
+		//var fID = this.get_fID_($fbDockChatTabFlyout);
+		var returnMsgArray = new Array();
+		$fbDockChatTabFlyout.find('div.fbChatConvItem').each(function(i,o){
+				var whoSpeak = $(o).find('div._50ke').find('a.profileLink').attr('href');
+				if(whoSpeak == '#')
+					whoSpeak = 'me';
+				else
+					whoSpeak = 'you';
+				//console.log('whoSpeak: ' + whoSpeak);
+				var sentenceArry = [];
+				$(o).find('div.messages').eq(0).find('div.direction_ltr').each(function(i2,o2){
+					// Mark the sentence as sended => for easy to extract new msg
+					if(!$(this).hasClass('CSCR_sended')){						
+						var sentence = $(o2).find('span.null').html();
+						sentenceArry.push(sentence);
+						//console.log(sentence);
+						$(this).addClass('CSCR_sended');
+						console.log(sentenceArry);
+					}
+				});
+				if(sentenceArry.length != 0){
+					var msgEl = {};
+					msgEl[whoSpeak] = sentenceArry;
+					console.log(msgEl);
+					returnMsgArray.push(msgEl);
+				}								
+		});
+		console.log(returnMsgArray);
+		return returnMsgArray;
+	}	
 };
