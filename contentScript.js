@@ -2,52 +2,93 @@ $(function(){
 	console.log('This is FBDragger!!');
 	init(); // Initialize FB_ChatRoomReplay & FB_ChatRoomDragger class
 	//CSCR_Init();
-	$('<button/>').addClass('testing-trigger-btn').css({'position': 'absolute', 'z-index': 999999999}).prependTo('body');
+	$('<button/>').addClass('testing-trigger-btn').css({'position': 'absolute', 'z-index': 999999999}).html('keyboard trigger').prependTo('body');
+	$('<button/>').addClass('testing-click-trigger-btn').css({'position': 'absolute', 'z-index': 999999999, 'top': '20px'}).html('testing btn 2').prependTo('body');
+	$('.testing-click-trigger-btn').on('click.clickingTrigger',function(){
+		//$.post('http://www.facebook.com/dialog/send?app_id=491382457656124&link="https://apps.facebook.com/xxxxxxxaxsa"&to=100004561781225&description="This is description Testing!!!!!!!!!"');
+		console.log('XDDDD');
+		$.post('/ajax/mercury/send_messages.php','message_batch[0][action_type]=ma-type%3Auser-generated-message&message_batch[0][thread_id]=mid.1394902587753%3A1a5fd48b331543ec29&message_batch[0][author]=fbid%3A1783485414&message_batch[0][author_email]&message_batch[0][coordinates]&message_batch[0][timestamp]=1398759042804&message_batch[0][timestamp_absolute]=Today&message_batch[0][timestamp_relative]=4%3A10pm&message_batch[0][timestamp_time_passed]=0&message_batch[0][is_unread]=false&message_batch[0][is_cleared]=false&message_batch[0][is_forward]=false&message_batch[0][is_filtered_content]=false&message_batch[0][is_spoof_warning]=false&message_batch[0][source]=source%3Achat%3Aweb&message_batch[0][source_tags][0]=source%3Achat&message_batch[0][body]=abc&message_batch[0][has_attachment]=false&message_batch[0][html_body]=false&&message_batch[0][specific_to_list][0]=fbid%3A100004561781225&message_batch[0][specific_to_list][1]=fbid%3A1783485414&message_batch[0][ui_push_phase]=V3&message_batch[0][status]=0&message_batch[0][message_id]=%3C1398759042804%3A3561721517-288698492%40mail.projektitan.com%3E&&client=mercury&__user=1783485414&__a=1&__dyn=7n8anEAMCBynzpQ9UoHaEWy6zECQqbx2mbAKGiyGGEVF4WpUpBxCFHw&__req=15&fb_dtsg=AQEqlHjuPTsB&ttstamp=265816911310872106117808411566&__rev=1225872',
+			function(data){
+				console.log('ajax sended');
+				console.log(data);
+			});
+	});
 	$('.testing-trigger-btn').on('click.testingTrigger',function(){
-		$('.uiTextareaAutogrow').each(function(idx,el){
-			console.log(el);
-			var enterEvent = $.Event("keyup");
-			var enterEvent2 = $.Event("keydown");
-			var enterEvent3 = $.Event("keypress");
-			var enterEvent4 = $.Event("input");
-			var enterEvent5 = $.Event("submit");
-			var focusEvent = $.Event("focus");
-			enterEvent.which = 13;
-			enterEvent.keyCode = 13;
-			enterEvent.namespace_re = '$';
-			console.log(enterEvent);
+		var $inputBarDOM = $('.fbDockChatTabFlyout').find('.uiTextareaAutogrow');
+		console.log($inputBarDOM);
 
-			enterEvent2.which = 13;
-			enterEvent2.keyCode = 13;
-			enterEvent2.namespace_re = '$';
-			console.log(enterEvent2);
+		console.log($inputBarDOM);
+		//var enterEvent = $.Event("keyup");
+		var enterEvent2 = $.Event("keydown");
+		//var enterEvent3 = $.Event("keypress");
+		//var enterEvent4 = $.Event("input");
+		//var enterEvent5 = $.Event("submit");
+		var focusEvent = $.Event("focus");
+		
+		//enterEvent.which = 13;
+		//enterEvent.keyCode = 13;
+		//enterEvent.namespace_re = '$';
+		//enterEvent.shiftKey = true;
+		
+		//console.log(enterEvent);
 
-			
-			enterEvent3.which = 13;
-			enterEvent3.keyCode = 13;				
-			enterEvent3.namespace_re = '$';
+		enterEvent2.which = 13;
+		enterEvent2.keyCode = 13;
+		enterEvent2.namespace_re = '$';
+		enterEvent2.isDefaultPrevented = function Z(){return!0};
+		//enterEvent2.shiftKey = true;
+		console.log(enterEvent2);
+enterEvent2.altKey= false;
+enterEvent2.bubbles= true;
+enterEvent2.cancelable= true;
+enterEvent2.char= undefined;
+enterEvent2.charCode= 0;
+enterEvent2.ctrlKey= false;
+//currentTarget: textarea.uiTextareaAutogrow._552m
+//data: undefined
+//delegateTarget: textarea.uiTextareaAutogrow._552m
+enterEvent2.eventPhase= 2;
+//handleObj: Object
+//isDefaultPrevented: function Z(){return!0}
+//jQuery21009250001697801054: true
+//key: undefined
+//keyCode: 13
+enterEvent2.isTrigger = undefined;
+enterEvent2.metaKey= false;
+//enterEvent2.originalEvent= KeyboardEvent;
+enterEvent2.relatedTarget= undefined;
+enterEvent2.shiftKey= false;
+//target: textarea.uiTextareaAutogrow._552m
+//timeStamp: 1398736147866
+//type: "keydown"
+//view: Window
+//which: 13
+		/*
+		enterEvent3.which = 13;
+		enterEvent3.keyCode = 13;				
+		enterEvent3.namespace_re = '$';
+		//enterEvent3.shiftKey = true;
 
 
-			enterEvent4.namespace_re = '$';
-			enterEvent5.namespace_re = '$';
+		enterEvent4.namespace_re = '$';
+		enterEvent5.namespace_re = '$';
+		*/
 
 
-			$(el).trigger(enterEvent);
-			$(el).trigger(enterEvent2);
-			$(el).trigger(enterEvent3);
-			$(el).trigger(enterEvent4);
-			$(el).trigger(enterEvent5);
-			$(el).parent().trigger(enterEvent);
-			$(el).parent().trigger(enterEvent2);
-			$(el).parent().trigger(enterEvent3);
-			$(el).parent().parent().trigger(enterEvent);
-			$(el).parent().parent().trigger(enterEvent2);
-			$(el).parent().parent().trigger(enterEvent3);
-			$(el).trigger(focusEvent).trigger(enterEvent);
-			$(el).trigger(focusEvent).trigger(enterEvent2);
-			$(el).trigger(focusEvent).trigger(enterEvent3);
-
-		});
+		//$inputBarDOM.trigger(enterEvent);
+		$inputBarDOM.trigger(enterEvent2,[true]);
+		//$inputBarDOM.trigger(enterEvent3);
+		//$inputBarDOM.trigger(enterEvent4);
+		//$inputBarDOM.trigger(enterEvent5);
+		//$inputBarDOM.parent().trigger(enterEvent);
+		$inputBarDOM.parent().trigger(enterEvent2,[true]);
+		//$inputBarDOM.parent().trigger(enterEvent3);
+		//$inputBarDOM.parent().parent().trigger(enterEvent);
+		$inputBarDOM.parent().parent().trigger(enterEvent2,[true]);
+		//$inputBarDOM.parent().parent().trigger(enterEvent3);
+		//$inputBarDOM.trigger(focusEvent).trigger(enterEvent);
+		$inputBarDOM.trigger(focusEvent).trigger(enterEvent2,[true]);
+		//$inputBarDOM.trigger(focusEvent).trigger(enterEvent3);
 	});
 });
 
@@ -142,7 +183,7 @@ function delay_CSCR_Comp(){
 		$(DOMObj).on('keydown.CSCR',function(event){
 			if(event.keyCode == 13){
 				console.log('==keydown.CSCR==: event trigger');
-				console.log(event);
+				//console.log(event);
 				var $currentChatDOM = $(this);			
 				FB_CrossSiteChatRoom.sendTo_bg($currentChatDOM);
 			}
@@ -280,32 +321,36 @@ var FB_ChatRoomReplay = {
 	$prevChatDOM_: NaN,
 	$currentChatDOM: NaN,
 	getWords: function(keyCode){
-		var fID = this.get_fID_();  // Get fID		
-		// Update sentence index
-		if(keyCode == 38){
-			//console.log('=== up! ===');
-			if(this.currentIdx_[fID]>0)
-				this.currentIdx_[fID]--;
-		}
-		if(keyCode == 40){
-			//console.log('=== down! ===');
-			if(this.currentIdx_[fID] < this.myWords_[fID].length-1){
-				this.currentIdx_[fID]++;
+		var fID = this.get_fID_();  // Get fID
+		// onle work if 1. dialog has no unsended msg  2. dialog is prev sentence
+		if(this.$currentChatDOM.val() == '' || this.currentIdx_[fID] < this.myWords_[fID].length){
+			// Update sentence index
+			if(keyCode == 38){
+				//console.log('=== up! ===');
+				if(this.currentIdx_[fID]>0)
+					this.currentIdx_[fID]--;
 			}
-			else if(this.currentIdx_[fID] == this.myWords_[fID].length-1){
-				//console.log('End of conv');
-				this.currentIdx_[fID]++;
-				this.$currentChatDOM.val('');
-				return
+			if(keyCode == 40){
+				//console.log('=== down! ===');
+				if(this.currentIdx_[fID] < this.myWords_[fID].length-1){
+					this.currentIdx_[fID]++;
+				}
+				else if(this.currentIdx_[fID] == this.myWords_[fID].length-1){
+					//console.log('End of conv');
+					this.currentIdx_[fID]++;
+					this.$currentChatDOM.val('');
+					return
+				}
 			}
-		}
-		var currentIdx = this.currentIdx_[fID]; // Get sentence index
-		var appendWords = this.myWords_[fID][currentIdx]; // Get sentence words
-		this.$currentChatDOM.val(appendWords); // Append words into conversation dialog		
+			var currentIdx = this.currentIdx_[fID]; // Get sentence index
+			var appendWords = this.myWords_[fID][currentIdx]; // Get sentence words
+			this.$currentChatDOM.val(appendWords); // Append words into conversation dialog				
+		}			
 	},
 	init: function(resetIdx){
 		console.log('=== init!! ===');
 		var fID = this.get_fID_();  // Get fID
+		console.log(fID);
 		this.myWords_[fID] = [];  // initialize the conversation array
 		// get all DOM in ".conversation"
 		var $conDOM =  this.$currentChatDOM.parent().parent().prev().find('div.conversation').children();
@@ -422,7 +467,7 @@ var FB_CrossSiteChatRoom = {
 	receiveFrom_bg: function(Data){
 		console.log('receive new messge from background(CR)');
 		console.log(Data);
-		var $targetDOM = this.get_DOM_by_fID(Data.fID);
+		var $targetDOM = this.get_DOM_by_fID(Data.fID); // .fbDockChatTabFlyout
 		console.log($targetDOM);
 		console.log(this.get_fName_($targetDOM));
 		console.log(this.get_fID_($targetDOM));
@@ -430,22 +475,38 @@ var FB_CrossSiteChatRoom = {
 		
 
 		//var focusEvent = $.
-		var enterEvent = $.Event("keyup.test");
-		var enterEvent2 = $.Event("keydown.test");
-		var enterEvent3 = $.Event("keypress.test");
+		var enterEvent = $.Event("keyup");
+		var enterEvent2 = $.Event("keydown");
+		var enterEvent3 = $.Event("keypress");
+		var focusEvent = $.Event("focus");
+
 		enterEvent.which = 13;
 		enterEvent.keyCode = 13;
-		enterEvent.which2 = 13;
-		enterEvent.keyCode2 = 13;
-		enterEvent.which3 = 13;
-		enterEvent.keyCode3 = 13;				
-		$targetDOM.find('.uiTextareaAutogrow').val(Data.msg);
-		$targetDOM.find('.uiTextareaAutogrow').trigger(enterEvent);
-		$targetDOM.find('.uiTextareaAutogrow').trigger(enterEvent2);
-		$targetDOM.find('.uiTextareaAutogrow').trigger(enterEvent3);
-		$targetDOM.find('.uiTextareaAutogrow').parent().trigger(enterEvent);
-		$targetDOM.find('.uiTextareaAutogrow').parent().trigger(enterEvent2);
-		$targetDOM.find('.uiTextareaAutogrow').parent().trigger(enterEvent3);
+		enterEvent.namespace_re = '$';
+		enterEvent.shiftKey = false;
+
+
+		enterEvent2.which = 13;
+		enterEvent2.keyCode = 13;
+		enterEvent2.namespace_re = '$';
+		enterEvent2.shiftKey = false;
+
+
+		enterEvent3.which = 13;
+		enterEvent3.keyCode = 13;				
+		enterEvent3.namespace_re = '$';
+		enterEvent3.shiftKey = false;
+
+
+		var $inputBarDOM = $targetDOM.find('.uiTextareaAutogrow').eq(0);
+		console.log($inputBarDOM);
+		$inputBarDOM.val(Data.msg);
+		$inputBarDOM.trigger(focusEvent).trigger(enterEvent);
+		$inputBarDOM.trigger(focusEvent).trigger(enterEvent2);
+		$inputBarDOM.trigger(focusEvent).trigger(enterEvent3);
+		$inputBarDOM.parent().trigger(focusEvent).trigger(enterEvent);
+		$inputBarDOM.parent().trigger(focusEvent).trigger(enterEvent2);
+		$inputBarDOM.parent().trigger(focusEvent).trigger(enterEvent3);
 		//$targetDOM.find('uiTextareaAutogrow').html(Data.msg);
 	},
 	/*
@@ -462,52 +523,53 @@ var FB_CrossSiteChatRoom = {
 			//@ Get fID
 			var fID = FB_CrossSiteChatRoom.get_fID_($(eachChatRoom));
 			initDataTmp[fID] = {};
-			//console.log(fID);
+			console.log(fID);
 
 			//@ Get fName
 			var fName = FB_CrossSiteChatRoom.get_fName_($(eachChatRoom));
 			initDataTmp[fID]['fName'] = fName;
-			//console.log(fName);
+			console.log(fName);
 
 			//@ Get profilePhoto
 			var profilePhoto = FB_CrossSiteChatRoom.get_profilePhoto_($(eachChatRoom));
 			initDataTmp[fID]['profilePhoto'] = profilePhoto;	
-			//console.log(profilePhoto);
+			console.log(profilePhoto);
 
 			/*
 			@ Get conversation message
-			@ div.fbChatConvItem(n)
-				|- div._50ke(1)
-				|	|- a.profileLink => $.attr('href') --> who speak
-				|- div.messages(1)
+			@ div.fbNubFlyoutInner(n)
+				|- a._5ys_(1) -> only appear on opposite
+				|	|- img => $.attr('src') --> photo url
+				|- div.conversation(1)
 					|- div.direction_ltr(n)
 						|- span.null => $.html() -->  message	
 			*/
 			initDataTmp[fID]['msg'] = [];
-			$(eachChatRoom).find('div.fbChatConvItem').each(function(i,o){
-				
+			$(eachChatRoom).find('div.conversation').find('div.direction_ltr').each(function(i,o){
 
-				var whoSpeak = $(o).find('div._50ke').find('a.profileLink').attr('href');
-				if(whoSpeak == '#')
-					whoSpeak = 'me';
-				else
-					whoSpeak = 'you';
-				//console.log('whoSpeak: ' + whoSpeak);
+				// Mark the sentence as sended => for easy to extract new msg
+				if(!$(this).hasClass('CSCR_sended'))
+					$(this).addClass('CSCR_sended');
+
+				// Extract sentence
+				var sentence = $(o).find('span.null').html();
 				var sentenceArry = [];
-				$(o).find('div.messages').find('div.direction_ltr').each(function(i2,o2){
-					// Mark the sentence as sended => for easy to extract new msg
-					if(!$(this).hasClass('CSCR_sended'))
-						$(this).addClass('CSCR_sended');
+				sentenceArry.push(sentence);
+				console.log(sentence);
+				
+				var whoSpeak;
+				if($(o).find('a._5ys_').length !== 0)
+					whoSpeak = 'you';
+				else
+					whoSpeak = 'me';
+				console.log('===who ===');
+				console.log(whoSpeak);	
 
-					// Extract sentence
-					var sentence = $(o2).find('span.null').html();
-					sentenceArry.push(sentence);
-					//console.log(sentence);
-				})
 				var msgEl = {};
 				msgEl[whoSpeak] = sentenceArry;
 				initDataTmp[fID]['msg'].push(msgEl);
-			});
+
+			})
 		});
 		// Update the initData
 		this.initData = initDataTmp;
@@ -560,43 +622,64 @@ var FB_CrossSiteChatRoom = {
 		var profilePhoto = '/images/spacer.gif'; // default hidden profile img on FB
 		var breakFlag = false;
 		var searchIdx = 0;
-		$fbDockChatTabFlyout.find('.profilePhoto').each(function(i,o){
-			if($(o).attr('src') != '/images/spacer.gif'){
-				profilePhoto = $(o).attr('src')
+		/*
+		@ .fbDockChatTabFlyout(n)
+			|-._5ys_ (n)
+				|-img -> src
+		*/
+		$fbDockChatTabFlyout.find('._5ys_').each(function(i,o){
+			if($(o).find('img').attr('src') != '/images/spacer.gif'){
+				profilePhoto = $(o).find('img').attr('src')
 				return false; // break the each
 			}
-		});
+		});		
 		return profilePhoto;
 	},
 	extractNewMsg: function($fbDockChatTabFlyout,fID){
-		//var fID = this.get_fID_($fbDockChatTabFlyout);
+		/*
+		@ Get conversation message
+		@ div.fbNubFlyoutInner(n)
+			|- a._5ys_(1) -> only appear on opposite
+			|	|- img => $.attr('src') --> photo url
+			|- div.conversation(1)
+				|- div.direction_ltr(n)
+					|- span.null => $.html() -->  message	
+		*/
+		//initDataTmp[fID]['msg'] = [];
 		var returnMsgArray = new Array();
-		$fbDockChatTabFlyout.find('div.fbChatConvItem').each(function(i,o){
-				var whoSpeak = $(o).find('div._50ke').find('a.profileLink').attr('href');
-				if(whoSpeak == '#')
-					whoSpeak = 'me';
-				else
-					whoSpeak = 'you';
-				//console.log('whoSpeak: ' + whoSpeak);
-				var sentenceArry = [];
-				$(o).find('div.messages').eq(0).find('div.direction_ltr').each(function(i2,o2){
-					// Mark the sentence as sended => for easy to extract new msg
-					if(!$(this).hasClass('CSCR_sended')){						
-						var sentence = $(o2).find('span.null').html();
-						sentenceArry.push(sentence);
-						//console.log(sentence);
-						$(this).addClass('CSCR_sended');
-						console.log(sentenceArry);
-					}
-				});
-				if(sentenceArry.length != 0){
-					var msgEl = {};
-					msgEl[whoSpeak] = sentenceArry;
-					console.log(msgEl);
-					returnMsgArray.push(msgEl);
-				}								
+
+		$fbDockChatTabFlyout.find('div.conversation').find('div.direction_ltr').each(function(i,o){			
+			var whoSpeak;
+			if($(o).find('a._5ys_').length !== 0)
+				whoSpeak = 'you';
+			else
+				whoSpeak = 'me';
+			console.log('===who ===');
+			console.log(whoSpeak);	
+
+			var sentence;
+			var sentenceArry = [];
+
+			if(!$(o).hasClass('CSCR_sended')){						
+				var sentence = $(o).find('span.null').html();
+				sentenceArry.push(sentence);
+				$(o).addClass('CSCR_sended');
+			}
+
+			if(sentenceArry.length != 0){
+				var msgEl = {};
+				msgEl[whoSpeak] = sentenceArry;
+				returnMsgArray.push(msgEl);
+			}
 		});
-		console.log(returnMsgArray);
 		return returnMsgArray;
+
 	}	
 };
+
+var TextAreaControl = {
+	getInstance: function(test){
+		console.log(test);
+		alert('XDDDD');
+	}
+}

@@ -27,7 +27,9 @@ chrome.browserAction.onClicked.addListener(function(){
 	});
 })
 
-//var initData = null;
+/*
+@ add lisntener for receive & send message
+*/
 chrome.runtime.onMessage.addListener(
   function(msg, sender, sendResponse) {
     console.log('receive from FB content scripts');
@@ -45,6 +47,20 @@ chrome.runtime.onMessage.addListener(
     	FB_CrossSiteChatRoom_BG.sendTo_FB(msg);
     }
 });
+
+/*
+@ update the 'initializedTab' variable when page refresh
+*/
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+	if(changeInfo.status == 'complete'){
+		console.log("tabId: " + tabId + " has been refreshed");
+		var index = FB_CrossSiteChatRoom_BG.initializedTab.indexOf(tabId);
+		FB_CrossSiteChatRoom_BG.initializedTab.splice(index, 1);
+	}
+});
+
+
+
 
 var FB_CrossSiteChatRoom_BG = {
 	initializedTab: [],
